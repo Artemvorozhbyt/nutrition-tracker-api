@@ -12,10 +12,16 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<User> Users => Set<User>();
-
     public DbSet<Product> Products => Set<Product>();
-
     public DbSet<MealEntry> MealEntries => Set<MealEntry>();
-
     public DbSet<DailyGoal> DailyGoals => Set<DailyGoal>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>()
+            .HasIndex(x => x.Email)
+            .IsUnique();
+    }
 }

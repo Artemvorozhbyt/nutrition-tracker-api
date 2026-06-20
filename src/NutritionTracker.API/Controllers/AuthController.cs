@@ -12,9 +12,14 @@ public class AuthController : ControllerBase
 {
     private readonly IUserRepository _repository;
 
-    public AuthController(IUserRepository repository)
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
+
+    public AuthController(
+    IUserRepository repository,
+    IJwtTokenGenerator jwtTokenGenerator)
     {
         _repository = repository;
+        _jwtTokenGenerator = jwtTokenGenerator;
     }
 
     [HttpPost("register")]
@@ -46,5 +51,35 @@ public class AuthController : ControllerBase
         await _repository.AddAsync(user);
 
         return StatusCode(201);
+    }
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest request)
+    {
+        var user = await _repository.GetByEmailAsync(request.Email);
+
+        if (user is null)
+        {
+            return Unauthorized("Invalid email or password");
+        }
+
+        var passwordValid =
+            BCrypt.Net.BCrypt.Verify(
+                request.Password,
+                user.PasswordHash);
+
+        if (!passwordValid)
+        {
+            return Unauthorized("Invalid email or password");
+        }
+
+        var token =
+            _jwtTokenGenerator.GenerateToken(
+                user.Id,
+                user.Email);
+
+        return Ok(new LoginResponse
+        {
+            AccessToken = token
+        });
     }
 }
