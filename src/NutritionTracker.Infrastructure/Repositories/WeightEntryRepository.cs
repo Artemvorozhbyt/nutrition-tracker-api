@@ -28,4 +28,12 @@ public class WeightEntryRepository : IWeightEntryRepository
 			.OrderByDescending(x => x.Date)
 			.ToListAsync();
 	}
+
+	public async Task<WeightEntry?> GetLatestByUserIdAsync(Guid userId)
+	{
+		return await _context.WeightEntries
+			.Where(x => x.UserId == userId)
+			.OrderByDescending(x => x.Date)
+			.FirstOrDefaultAsync();
+	}
 }
