@@ -38,4 +38,15 @@ public class MealEntryRepository : IMealEntryRepository
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<MealEntry>> GetByUserIdAndDateAsync(
+    Guid userId,
+    DateOnly date)
+    {
+        return await _context.MealEntries
+            .Where(x =>
+                x.UserId == userId &&
+                x.Date == date)
+            .ToListAsync();
+    }
 }
