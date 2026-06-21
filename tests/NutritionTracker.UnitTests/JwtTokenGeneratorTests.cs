@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using NutritionTracker.Infrastructure.Services;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace NutritionTracker.UnitTests;
 

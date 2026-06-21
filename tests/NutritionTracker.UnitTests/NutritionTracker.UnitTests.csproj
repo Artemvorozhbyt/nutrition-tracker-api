@@ -14,6 +14,7 @@
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
     <ProjectReference Include="..\..\src\NutritionTracker.Infrastructure\NutritionTracker.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\NutritionTracker.API\NutritionTracker.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>
