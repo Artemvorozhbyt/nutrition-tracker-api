@@ -29,6 +29,8 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
+        services.AddScoped<IWeightEntryRepository, WeightEntryRepository>();
+
         return services;
     }
 }

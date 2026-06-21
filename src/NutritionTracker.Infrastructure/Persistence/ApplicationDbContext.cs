@@ -15,6 +15,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Product> Products => Set<Product>();
     public DbSet<MealEntry> MealEntries => Set<MealEntry>();
     public DbSet<DailyGoal> DailyGoals => Set<DailyGoal>();
+    public DbSet<WeightEntry> WeightEntries => Set<WeightEntry>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
