@@ -1,4 +1,4 @@
-﻿namespace NutritionTracker.UnitTests;
+﻿namespace NutritionTracker.Tests;
 
 public class UnitTest1
 {
