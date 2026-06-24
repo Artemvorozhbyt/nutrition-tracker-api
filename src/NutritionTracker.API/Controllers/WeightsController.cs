@@ -73,4 +73,50 @@ public class WeightsController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpGet("history")]
+    public async Task<IActionResult> GetHistory()
+    {
+        var userIdClaim =
+            User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrWhiteSpace(userIdClaim))
+        {
+            return Unauthorized();
+        }
+
+        var entries =
+            await _repository.GetByUserIdAsync(
+                Guid.Parse(userIdClaim));
+
+        if (!entries.Any())
+        {
+            return Ok(new WeightHistoryResponse());
+        }
+
+        var ordered =
+            entries.OrderBy(x => x.Date).ToList();
+
+        var startWeight = ordered.First().Weight;
+        var currentWeight = ordered.Last().Weight;
+
+        var response = new WeightHistoryResponse
+        {
+            StartWeight = startWeight,
+            CurrentWeight = currentWeight,
+            Difference = currentWeight - startWeight,
+
+            Entries = ordered
+                .Select(x => new WeightEntryResponse
+                {
+                    Id = x.Id,
+                    Weight = x.Weight,
+                    Date = x.Date
+                })
+                .ToList()
+        };
+
+        return Ok(response);
+    }
 }

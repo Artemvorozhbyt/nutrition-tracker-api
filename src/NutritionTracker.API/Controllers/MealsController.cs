@@ -133,4 +133,56 @@ public class MealsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+    Guid id,
+    UpdateMealEntryRequest request)
+    {
+        var userIdClaim =
+            User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrWhiteSpace(userIdClaim))
+        {
+            return Unauthorized();
+        }
+
+        var userId = Guid.Parse(userIdClaim);
+
+        var meal =
+            await _mealRepository.GetByIdAsync(id);
+
+        if (meal is null)
+        {
+            return NotFound();
+        }
+
+        if (meal.UserId != userId)
+        {
+            return Forbid();
+        }
+
+        var product =
+            await _productRepository.GetByIdAsync(request.ProductId);
+
+        if (product is null)
+        {
+            return NotFound("Product not found");
+        }
+
+        var factor = request.WeightInGrams / 100m;
+
+        meal.ProductId = product.Id;
+        meal.WeightInGrams = request.WeightInGrams;
+
+        meal.Calories = product.CaloriesPer100g * factor;
+        meal.Protein = product.ProteinPer100g * factor;
+        meal.Fat = product.FatPer100g * factor;
+        meal.Carbs = product.CarbsPer100g * factor;
+
+        await _mealRepository.UpdateAsync(meal);
+
+        return NoContent();
+    }
 }

@@ -39,6 +39,13 @@ public class MealEntryRepository : IMealEntryRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task UpdateAsync(MealEntry mealEntry)
+    {
+        _context.MealEntries.Update(mealEntry);
+
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<List<MealEntry>> GetByUserIdAndDateAsync(
     Guid userId,
     DateOnly date)

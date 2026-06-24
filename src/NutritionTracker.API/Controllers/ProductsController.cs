@@ -15,12 +15,6 @@ public class ProductsController : ControllerBase
         _repository = repository;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        return Ok(await _repository.GetAllAsync());
-    }
-
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
@@ -44,5 +38,23 @@ public class ProductsController : ControllerBase
             nameof(GetById),
             new { id = product.Id },
             product);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+    [FromQuery] string? search,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10)
+    {
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            return Ok(
+                await _repository.SearchAsync(search));
+        }
+
+        return Ok(
+            await _repository.GetPagedAsync(
+                page,
+                pageSize));
     }
 }

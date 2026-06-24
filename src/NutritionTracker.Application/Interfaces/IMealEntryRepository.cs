@@ -12,6 +12,8 @@ public interface IMealEntryRepository
 
     Task DeleteAsync(MealEntry mealEntry);
 
+    Task UpdateAsync(MealEntry mealEntry);
+
     Task<List<MealEntry>> GetByUserIdAndDateAsync(
     Guid userId,
     DateOnly date);

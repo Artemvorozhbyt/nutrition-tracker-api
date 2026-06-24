@@ -41,4 +41,24 @@ public class ProductRepository : IProductRepository
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
     }
+    public async Task<List<Product>> SearchAsync(
+    string searchTerm)
+    {
+        return await _context.Products
+            .Where(x =>
+                x.Name.ToLower()
+                    .Contains(searchTerm.ToLower()))
+            .ToListAsync();
+    }
+
+    public async Task<List<Product>> GetPagedAsync(
+    int page,
+    int pageSize)
+    {
+        return await _context.Products
+            .OrderBy(x => x.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
 }
