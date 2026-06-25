@@ -22,7 +22,7 @@ public class WeightsController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        CreateWeightEntryRequest request)
+    CreateWeightEntryRequest request)
     {
         var userIdClaim =
             User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -33,12 +33,30 @@ public class WeightsController : ControllerBase
             return Unauthorized();
         }
 
+        var userId = Guid.Parse(userIdClaim);
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        var existingEntry =
+            await _repository.GetByUserIdAndDateAsync(
+                userId,
+                today);
+
+        if (existingEntry is not null)
+        {
+            existingEntry.Weight = request.Weight;
+
+            await _repository.UpdateAsync(existingEntry);
+
+            return Ok();
+        }
+
         var weightEntry = new WeightEntry
         {
             Id = Guid.NewGuid(),
-            UserId = Guid.Parse(userIdClaim),
+            UserId = userId,
             Weight = request.Weight,
-            Date = DateOnly.FromDateTime(DateTime.UtcNow),
+            Date = today,
             CreatedAt = DateTime.UtcNow
         };
 

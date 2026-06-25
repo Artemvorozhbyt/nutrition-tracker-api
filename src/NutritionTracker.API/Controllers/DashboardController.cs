@@ -57,19 +57,53 @@ public class DashboardController : ControllerBase
                 userId,
                 today);
 
+        var consumedProtein =
+            meals.Sum(x => x.Protein);
+
+        var consumedFat =
+            meals.Sum(x => x.Fat);
+
+        var consumedCarbs =
+            meals.Sum(x => x.Carbs);
+
         var consumedCalories =
             meals.Sum(x => x.Calories);
+
+        var weightEntries =
+            await _weightRepository.GetByUserIdAsync(userId);
+
+        decimal? weightDifference = null;
+
+        if (weightEntries.Count >= 2)
+        {
+            var oldest =
+                weightEntries.Last().Weight;
+
+            var newest =
+                weightEntries.First().Weight;
+
+            weightDifference =
+                newest - oldest;
+        }
 
         var response = new DashboardResponse
         {
             CurrentWeight = latestWeight?.Weight,
+
+            WeightDifference = weightDifference,
 
             GoalCalories = goal.TargetCalories,
 
             ConsumedCalories = consumedCalories,
 
             RemainingCalories =
-                goal.TargetCalories - consumedCalories,
+        goal.TargetCalories - consumedCalories,
+
+            ConsumedProtein = consumedProtein,
+
+            ConsumedFat = consumedFat,
+
+            ConsumedCarbs = consumedCarbs,
 
             MealsToday = meals.Count
         };

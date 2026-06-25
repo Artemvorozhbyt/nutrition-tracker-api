@@ -21,19 +21,41 @@ public class WeightEntryRepository : IWeightEntryRepository
 		await _context.SaveChangesAsync();
 	}
 
-	public async Task<List<WeightEntry>> GetByUserIdAsync(Guid userId)
+    public async Task<List<WeightEntry>> GetByUserIdAsync(Guid userId)
+    {
+        return await _context.WeightEntries
+            .Where(x => x.UserId == userId)
+            .OrderByDescending(x => x.Date)
+            .ThenByDescending(x => x.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<WeightEntry?> GetLatestByUserIdAsync(Guid userId)
 	{
 		return await _context.WeightEntries
 			.Where(x => x.UserId == userId)
 			.OrderByDescending(x => x.Date)
-			.ToListAsync();
+            .ThenByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync();
 	}
 
-	public async Task<WeightEntry?> GetLatestByUserIdAsync(Guid userId)
-	{
-		return await _context.WeightEntries
-			.Where(x => x.UserId == userId)
-			.OrderByDescending(x => x.Date)
-			.FirstOrDefaultAsync();
-	}
+    public async Task<WeightEntry?> GetByUserIdAndDateAsync(
+     Guid userId,
+     DateOnly date)
+    {
+        return await _context.WeightEntries
+            .Where(x =>
+                x.UserId == userId &&
+                x.Date == date)
+            .OrderByDescending(x => x.CreatedAt)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task UpdateAsync(
+        WeightEntry weightEntry)
+    {
+        _context.WeightEntries.Update(weightEntry);
+
+        await _context.SaveChangesAsync();
+    }
 }
