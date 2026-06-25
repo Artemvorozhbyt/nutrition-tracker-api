@@ -58,4 +58,18 @@ public class WeightEntryRepository : IWeightEntryRepository
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task<WeightEntry?> GetByIdAsync(Guid id)
+    {
+        return await _context.WeightEntries
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task DeleteAsync(
+    WeightEntry weightEntry)
+    {
+        _context.WeightEntries.Remove(weightEntry);
+
+        await _context.SaveChangesAsync();
+    }
 }

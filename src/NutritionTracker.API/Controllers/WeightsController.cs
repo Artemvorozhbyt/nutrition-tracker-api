@@ -65,6 +65,74 @@ public class WeightsController : ControllerBase
         return StatusCode(201);
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+    Guid id,
+    UpdateWeightEntryRequest request)
+    {
+        var userIdClaim =
+            User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrWhiteSpace(userIdClaim))
+        {
+            return Unauthorized();
+        }
+
+        var userId = Guid.Parse(userIdClaim);
+
+        var weightEntry =
+            await _repository.GetByIdAsync(id);
+
+        if (weightEntry is null)
+        {
+            return NotFound();
+        }
+
+        if (weightEntry.UserId != userId)
+        {
+            return Forbid();
+        }
+
+        weightEntry.Weight = request.Weight;
+
+        await _repository.UpdateAsync(weightEntry);
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userIdClaim =
+            User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+
+        if (string.IsNullOrWhiteSpace(userIdClaim))
+        {
+            return Unauthorized();
+        }
+
+        var userId = Guid.Parse(userIdClaim);
+
+        var weightEntry =
+            await _repository.GetByIdAsync(id);
+
+        if (weightEntry is null)
+        {
+            return NotFound();
+        }
+
+        if (weightEntry.UserId != userId)
+        {
+            return Forbid();
+        }
+
+        await _repository.DeleteAsync(weightEntry);
+
+        return NoContent();
+    }
+
     [HttpGet]
     public async Task<IActionResult> Get()
     {

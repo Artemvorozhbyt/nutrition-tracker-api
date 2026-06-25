@@ -14,5 +14,9 @@ public interface IWeightEntryRepository
         Guid userId,
         DateOnly date);
 
+    Task<WeightEntry?> GetByIdAsync(Guid id);
+
     Task UpdateAsync(WeightEntry weightEntry);
+
+    Task DeleteAsync(WeightEntry weightEntry);
 }
